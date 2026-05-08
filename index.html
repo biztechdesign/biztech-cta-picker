@@ -74,8 +74,22 @@
     transition: filter 0.15s ease, transform 0.05s ease;
     box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   }
-  .cta:hover { filter: brightness(0.92); }
+  .cta:hover  { background: var(--cta-hover) !important; }
   .cta:active { transform: translateY(1px); }
+
+  .hover-strip {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px;
+    font-size: 12px; color: var(--ink);
+    background: rgba(15,23,42,0.06);
+    padding: 4px 10px; border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hover-strip .dot { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
+  .stage.surface-teal .hover-strip,
+  .stage.surface-dark .hover-strip { background: rgba(255,255,255,0.18); color: #fff; }
+  .stage.surface-teal .hover-strip .dot,
+  .stage.surface-dark .hover-strip .dot { border-color: rgba(255,255,255,0.4); }
 
   .cta-meta {
     font-size: 12px; font-weight: 500;
@@ -203,6 +217,11 @@
     <div class="stage surface-white" id="stage" style="margin-top:10px">
       <button class="cta" id="ctaBtn">Talk to Experts &rarr;</button>
       <div class="cta-meta" id="ctaMeta">#7C2D12 on #FFFFFF</div>
+      <div class="hover-strip" id="hoverStrip">
+        <span style="opacity:0.7">Hover →</span>
+        <span class="dot" id="hoverDot"></span>
+        <span id="hoverHex">#5C220E</span>
+      </div>
     </div>
 
     <div class="cx">
@@ -294,6 +313,47 @@
     return contrast('#FFFFFF', bg) >= contrast('#1F2937', bg) ? '#FFFFFF' : '#1F2937';
   }
 
+  // ---- HSL conversion + auto-hover ----
+  function hexToHSL(hex) {
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16) / 255;
+    const g = parseInt(h.slice(2,4),16) / 255;
+    const b = parseInt(h.slice(4,6),16) / 255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let H, S, L = (max + min) / 2;
+    if (max === min) { H = S = 0; }
+    else {
+      const d = max - min;
+      S = L > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if      (max === r) H = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) H = (b - r) / d + 2;
+      else                H = (r - g) / d + 4;
+      H *= 60;
+    }
+    return [H, S * 100, L * 100];
+  }
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = l - c / 2;
+    let r, g, b;
+    if      (h < 60)  [r,g,b] = [c, x, 0];
+    else if (h < 120) [r,g,b] = [x, c, 0];
+    else if (h < 180) [r,g,b] = [0, c, x];
+    else if (h < 240) [r,g,b] = [0, x, c];
+    else if (h < 300) [r,g,b] = [x, 0, c];
+    else              [r,g,b] = [c, 0, x];
+    const toHex = v => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+    return ('#' + toHex(r) + toHex(g) + toHex(b)).toUpperCase();
+  }
+  // Best hover color: dark colors get lightened, others get darkened.
+  function bestHover(hex) {
+    const [h, s, l] = hexToHSL(hex);
+    const newL = l < 22 ? Math.min(96, l + 12) : Math.max(0, l - 10);
+    return hslToHex(h, s, newL);
+  }
+
   // ============================================================
   // Suggestions — curated to all clear ≥ 8:1 contrast w/ white text.
   // Mix of warm complements of teal + deep neutrals.
@@ -340,11 +400,19 @@
   // Render
   // ============================================================
   function render() {
+    // Auto-computed hover color — darken normal colors, lighten very dark ones
+    const hoverHex = bestHover(S.bg);
+
     // CTA
     ctaBtn.style.background = S.bg;
     ctaBtn.style.color      = S.txt;
     ctaBtn.style.borderRadius = S.rad + 'px';
+    ctaBtn.style.setProperty('--cta-hover', hoverHex);
     ctaBtn.textContent = S.label;
+
+    // Hover preview strip
+    $('hoverDot').style.background = hoverHex;
+    $('hoverHex').textContent = hoverHex;
 
     // Stage surface
     stage.className = 'stage surface-' + S.surface;
@@ -411,8 +479,9 @@
   <span class="k">font-weight</span>: <span class="v">600</span>;
   <span class="k">border</span>: <span class="v">0</span>;
   <span class="k">cursor</span>: <span class="v">pointer</span>;
+  <span class="k">transition</span>: <span class="v">background 0.15s ease</span>;
 }
-.cta:hover { <span class="k">filter</span>: <span class="v">brightness(0.92)</span>; }`.trim();
+.cta:hover { <span class="k">background</span>: <span class="v">${hoverHex}</span>; }`.trim();
 
     document.getElementById('copyBtn').onclick = copySnippet;
   }
