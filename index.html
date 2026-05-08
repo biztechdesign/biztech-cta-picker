@@ -23,9 +23,111 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 36px 24px 80px; }
+  .wrap {
+    display: grid;
+    grid-template-columns: 380px minmax(0, 1fr);
+    gap: 28px;
+    max-width: 1320px; margin: 0 auto; padding: 36px 24px 80px;
+    align-items: start;
+  }
+  @media (max-width: 980px) {
+    .wrap { grid-template-columns: 1fr; gap: 16px; }
+    .brand-rail { position: static !important; }
+  }
   h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.01em; }
   p.lead { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+
+  /* ---- sticky brand rail (logo + CTA preview + 3 quick colors) ---- */
+  .brand-rail {
+    position: sticky;
+    top: 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .rail-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .brand-rail .icon-box {
+    width: 100%; aspect-ratio: 1 / 1;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 26px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+  }
+  .brand-rail .icon-box svg { width: 100%; height: 100%; display: block; }
+
+  .cta-preview {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 12px 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+  }
+  .cta-mini {
+    background: #7C2D12;
+    color: #FFFFFF;
+    border: 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font: inherit; font-size: 13px; font-weight: 600; letter-spacing: 0.005em;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    transition: background 0.18s ease, transform 0.05s ease, box-shadow 0.18s ease;
+  }
+  .cta-mini:hover {
+    background: var(--cta-hover, #5C220E) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  }
+  .cta-mini:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+  .cta-preview .meta {
+    font-size: 10.5px; color: var(--muted);
+    letter-spacing: 0.04em; font-variant-numeric: tabular-nums;
+  }
+
+  .rail-caption {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.04em; text-align: center; line-height: 1.5;
+  }
+  .rail-caption b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .quick-pick {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .quick-pick button {
+    border: 0;
+    padding: 12px 8px;
+    border-radius: 10px;
+    color: #fff;
+    font: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    min-height: 64px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, box-shadow 0.18s ease, filter 0.15s ease;
+  }
+  .quick-pick button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    filter: brightness(1.08);
+  }
+  .quick-pick button:active { transform: translateY(0); }
+  .quick-pick button.active {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .quick-pick button .hex {
+    font-size: 9px; opacity: 0.85; font-weight: 500; letter-spacing: 0.02em;
+  }
 
   .card {
     background: var(--card);
@@ -37,43 +139,16 @@
   /* ---- preview stage ---- */
   .stage {
     border-radius: 14px;
-    padding: 40px 36px;
-    display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    padding: 60px 24px;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px;
     transition: background 0.2s ease;
     min-height: 260px;
     border: 1px solid var(--line);
-    flex-wrap: wrap;
   }
   .stage.surface-white { background: #FFFFFF; }
   .stage.surface-light { background: #F1F5F9; }
   .stage.surface-teal  { background: var(--logo-teal); }
   .stage.surface-dark  { background: var(--logo-dark); }
-
-  .stage-logo {
-    flex: 0 0 auto;
-    width: 160px; height: 160px;
-    background: #FFFFFF;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(15,23,42,0.06);
-  }
-  .stage-logo svg { width: 100%; height: 100%; display: block; }
-  .stage-logo-caption {
-    margin-top: 8px;
-    font-size: 11px; color: var(--muted);
-    font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
-    text-align: center;
-  }
-  .stage.surface-teal .stage-logo-caption,
-  .stage.surface-dark .stage-logo-caption { color: rgba(255,255,255,0.85); }
-  .stage-logo-wrap { display: flex; flex-direction: column; align-items: center; }
-
-  .stage-right {
-    flex: 1 1 260px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-  }
 
   .surface-row {
     display: inline-flex; gap: 4px;
@@ -226,6 +301,24 @@
 <body>
 <div class="wrap">
 
+  <aside class="brand-rail">
+    <div class="rail-compare">
+      <div class="icon-box" id="stageLogo"></div>
+      <div class="cta-preview">
+        <button class="cta-mini" id="railCta">Talk to Experts &rarr;</button>
+        <div class="meta" id="railCtaMeta">#7C2D12</div>
+      </div>
+    </div>
+    <div class="rail-caption"><b>Brand teal #35B0BF</b> vs CTA color</div>
+    <div class="quick-pick" id="quickPick">
+      <button data-color="#7C2D12" style="background:#7C2D12">Burnt Orange<span class="hex">#7C2D12</span></button>
+      <button data-color="#7F1D1D" style="background:#7F1D1D">Exec Red<span class="hex">#7F1D1D</span></button>
+      <button data-color="#6B21A8" style="background:#6B21A8">Royal Purple<span class="hex">#6B21A8</span></button>
+    </div>
+  </aside>
+
+  <main>
+
   <h1>Biztech CTA playground</h1>
   <p class="lead">Top swatch shows what's <b style="color:#B91C1C">currently live</b> on biztechcs.com. The 10 below all clear <b style="color:var(--ink)">≥&nbsp;8:1 contrast</b> (above WCAG&nbsp;AAA) with white text.</p>
 
@@ -242,18 +335,12 @@
     </div>
 
     <div class="stage surface-white" id="stage" style="margin-top:10px">
-      <div class="stage-logo-wrap">
-        <div class="stage-logo" id="stageLogo"></div>
-        <div class="stage-logo-caption">BIZTECH TEAL · #35B0BF</div>
-      </div>
-      <div class="stage-right">
-        <button class="cta" id="ctaBtn">Talk to Experts &rarr;</button>
-        <div class="cta-meta" id="ctaMeta">#7C2D12 on #FFFFFF</div>
-        <div class="hover-strip" id="hoverStrip">
-          <span style="opacity:0.7">Hover →</span>
-          <span class="dot" id="hoverDot"></span>
-          <span id="hoverHex">#5C220E</span>
-        </div>
+      <button class="cta" id="ctaBtn">Talk to Experts &rarr;</button>
+      <div class="cta-meta" id="ctaMeta">#7C2D12 on #FFFFFF</div>
+      <div class="hover-strip" id="hoverStrip">
+        <span style="opacity:0.7">Hover →</span>
+        <span class="dot" id="hoverDot"></span>
+        <span id="hoverHex">#5C220E</span>
       </div>
     </div>
 
@@ -321,6 +408,8 @@
       <button class="copy" id="copyBtn">Copy</button>
     </div>
   </div>
+
+  </main>
 
 </div>
 
@@ -442,6 +531,21 @@
     ctaBtn.style.borderRadius = S.rad + 'px';
     ctaBtn.style.setProperty('--cta-hover', hoverHex);
     ctaBtn.textContent = S.label;
+
+    // Rail CTA mirror
+    const railCta = $('railCta');
+    if (railCta) {
+      railCta.style.background = S.bg;
+      railCta.style.color      = S.txt;
+      railCta.style.setProperty('--cta-hover', hoverHex);
+      railCta.textContent = S.label;
+      $('railCtaMeta').textContent = `${S.bg} · hover ${hoverHex}`;
+    }
+
+    // Quick-pick active state
+    document.querySelectorAll('#quickPick button').forEach(b => {
+      b.classList.toggle('active', b.dataset.color.toUpperCase() === S.bg.toUpperCase());
+    });
 
     // Hover preview strip
     $('hoverDot').style.background = hoverHex;
@@ -589,6 +693,14 @@
     document.querySelectorAll('#surfaceRow button').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     S.surface = b.dataset.surface;
+    render();
+  });
+
+  document.getElementById('quickPick').addEventListener('click', e => {
+    const b = e.target.closest('button[data-color]');
+    if (!b) return;
+    S.bg = b.dataset.color.toUpperCase();
+    S.txt = bestText(S.bg);
     render();
   });
 
