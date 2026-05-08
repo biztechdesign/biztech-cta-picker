@@ -220,7 +220,7 @@
   <div class="grid">
 
     <div class="card">
-      <h2>Customize</h2>
+      <h2>Customize <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:11px">— text auto-flips to white or dark for best contrast</span></h2>
 
       <div class="row">
         <label for="pBg">Button</label>
@@ -460,11 +460,19 @@
   // Event wiring
   // ============================================================
   function bindColor(picker, hexInput, key) {
-    picker.addEventListener('input', e => { S[key] = norm(e.target.value); render(); });
+    picker.addEventListener('input', e => {
+      S[key] = norm(e.target.value);
+      if (key === 'bg') S.txt = bestText(S.bg); // auto-pair text with background
+      render();
+    });
     hexInput.addEventListener('input', e => {
       const v = e.target.value.trim();
       const cleaned = v.startsWith('#') ? v : '#' + v;
-      if (isHex(cleaned)) { S[key] = cleaned.toUpperCase(); render(); }
+      if (isHex(cleaned)) {
+        S[key] = cleaned.toUpperCase();
+        if (key === 'bg') S.txt = bestText(S.bg);
+        render();
+      }
     });
   }
   bindColor($('pBg'),  $('hBg'),  'bg');
