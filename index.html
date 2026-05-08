@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Biztech CTA Playground</title>
+<style>
+  :root {
+    --ink:   #0F172A;
+    --muted: #64748B;
+    --line:  #E2E8F0;
+    --bg:    #F8FAFC;
+    --card:  #FFFFFF;
+    --logo-teal: #35B0BF;
+    --logo-dark: #373435;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 36px 24px 80px; }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  p.lead { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+  }
+
+  /* ---- preview stage ---- */
+  .stage {
+    border-radius: 14px;
+    padding: 60px 24px;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px;
+    transition: background 0.2s ease;
+    min-height: 260px;
+    border: 1px solid var(--line);
+  }
+  .stage.surface-white { background: #FFFFFF; }
+  .stage.surface-light { background: #F1F5F9; }
+  .stage.surface-teal  { background: var(--logo-teal); }
+  .stage.surface-dark  { background: var(--logo-dark); }
+
+  .surface-row {
+    display: inline-flex; gap: 4px;
+    background: #F1F5F9; padding: 4px; border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .surface-row button {
+    border: 0; background: transparent; padding: 8px 14px;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    border-radius: 6px; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .surface-row button.active {
+    background: #FFFFFF; color: var(--ink);
+    box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+  }
+
+  /* ---- the CTA itself ---- */
+  .cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 30px; border: 0; border-radius: 10px;
+    font: inherit; font-size: 16px; font-weight: 600;
+    letter-spacing: 0.005em;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.05s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .cta:hover { filter: brightness(0.92); }
+  .cta:active { transform: translateY(1px); }
+
+  .cta-meta {
+    font-size: 12px; font-weight: 500;
+    padding: 4px 10px; border-radius: 999px;
+    background: rgba(15,23,42,0.06);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .stage.surface-teal .cta-meta,
+  .stage.surface-dark .cta-meta { background: rgba(255,255,255,0.18); color: #fff; }
+
+  /* ---- controls ---- */
+  .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 18px; margin-top: 18px; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row label { font-size: 13px; color: var(--muted); width: 70px; }
+  .row input[type=color] {
+    -webkit-appearance: none; appearance: none;
+    width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 8px;
+    background: transparent; cursor: pointer;
+  }
+  .row input[type=color]::-webkit-color-swatch { border: 0; border-radius: 6px; }
+  .row input[type=color]::-moz-color-swatch     { border: 0; border-radius: 6px; }
+  .row input[type=text] {
+    flex: 1; font: inherit; font-variant-numeric: tabular-nums; font-weight: 600;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .row input[type=text]:focus { outline: 2px solid #93C5FD; outline-offset: -1px; }
+
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .quick button {
+    background: #F1F5F9; border: 1px solid var(--line);
+    padding: 8px 12px; border-radius: 8px;
+    font: inherit; font-size: 12px; font-weight: 500;
+    cursor: pointer;
+  }
+  .quick button:hover { background: #E2E8F0; }
+
+  /* ---- contrast read-out ---- */
+  .cx {
+    margin-top: 16px; padding: 14px; border-radius: 10px;
+    background: #F8FAFC; border: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cx .num { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .cx .lbl { font-size: 12px; color: var(--muted); }
+  .badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .pill-aaa { background: #D1FAE5; color: #065F46; }
+  .pill-aa  { background: #DBEAFE; color: #1E3A8A; }
+  .pill-aa-l{ background: #FEF3C7; color: #92400E; }
+  .pill-fail{ background: #FEE2E2; color: #991B1B; }
+
+  /* ---- suggestions ---- */
+  .swatches { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .sw {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+    cursor: pointer; background: #fff;
+    transition: border 0.15s ease, transform 0.05s ease;
+    text-align: left;
+    font: inherit;
+  }
+  .sw:hover { border-color: #94A3B8; }
+  .sw.active { border-color: var(--ink); border-width: 2px; padding: 9px 11px; }
+  .sw .chip { width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.06); }
+  .sw .info { flex: 1; min-width: 0; }
+  .sw .info .name { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .sw .info .hex  { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .sw .info .note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .sw.is-current { background: #FFFBEB; border-color: #FCD34D; }
+  .sw.is-current:hover { border-color: #F59E0B; }
+  .current-badge {
+    display: inline-block; margin-left: 6px;
+    background: #DC2626; color: #fff;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+    padding: 2px 6px; border-radius: 4px; vertical-align: 1px;
+  }
+
+  /* ---- HTML/CSS snippet ---- */
+  .snippet {
+    margin-top: 18px; background: #0F172A; color: #E2E8F0;
+    border-radius: 12px; padding: 18px; font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 12.5px; line-height: 1.6; overflow-x: auto;
+    position: relative;
+  }
+  .snippet .copy {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(255,255,255,0.08); color: #E2E8F0;
+    border: 0; padding: 6px 10px; border-radius: 6px; font-size: 11px;
+    cursor: pointer;
+  }
+  .snippet .copy:hover { background: rgba(255,255,255,0.16); }
+  .snippet .k { color: #C4B5FD; }
+  .snippet .v { color: #FCD34D; }
+  .snippet .c { color: #64748B; }
+
+  h2 { font-size: 14px; margin: 0 0 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Biztech CTA playground</h1>
+  <p class="lead">Top swatch shows what's <b style="color:#B91C1C">currently live</b> on biztechcs.com. The 10 below all clear <b style="color:var(--ink)">≥&nbsp;8:1 contrast</b> (above WCAG&nbsp;AAA) with white text.</p>
+
+  <!-- ============ PREVIEW STAGE ============ -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <h2 style="margin:0">Live preview</h2>
+      <div class="surface-row" id="surfaceRow">
+        <button data-surface="white" class="active">White</button>
+        <button data-surface="light">Light gray</button>
+        <button data-surface="teal">Teal logo</button>
+        <button data-surface="dark">Dark</button>
+      </div>
+    </div>
+
+    <div class="stage surface-white" id="stage" style="margin-top:10px">
+      <button class="cta" id="ctaBtn">Talk to Experts &rarr;</button>
+      <div class="cta-meta" id="ctaMeta">#7C2D12 on #FFFFFF</div>
+    </div>
+
+    <div class="cx">
+      <div>
+        <div class="num" id="cxNum">9.29 : 1</div>
+        <div class="lbl" id="cxLbl">Contrast — button text vs button background</div>
+      </div>
+      <div class="badges" id="badges">
+        <!-- pills injected -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONTROLS + SUGGESTIONS ============ -->
+  <div class="grid">
+
+    <div class="card">
+      <h2>Customize</h2>
+
+      <div class="row">
+        <label for="pBg">Button</label>
+        <input type="color" id="pBg" value="#7C2D12" />
+        <input type="text"  id="hBg" value="#7C2D12" maxlength="7" />
+      </div>
+
+      <div class="row">
+        <label for="pTxt">Text</label>
+        <input type="color" id="pTxt" value="#FFFFFF" />
+        <input type="text"  id="hTxt" value="#FFFFFF" maxlength="7" />
+      </div>
+
+      <div class="row">
+        <label for="pRad">Radius</label>
+        <input type="range" id="pRad" min="0" max="32" value="10" style="flex:1" />
+        <span id="vRad" style="font-variant-numeric:tabular-nums;width:48px;text-align:right;color:var(--muted)">10px</span>
+      </div>
+
+      <div class="row">
+        <label for="pLbl">Label</label>
+        <input type="text" id="pLbl" value="Talk to Experts →" style="text-transform:none;letter-spacing:0" />
+      </div>
+
+      <div class="quick">
+        <button data-action="white-text">Use white text</button>
+        <button data-action="dark-text">Use dark text</button>
+        <button data-action="auto-text">Auto best text</button>
+        <button data-action="reset">Reset</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Suggested CTA colors <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">— all complement teal</span></h2>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+  </div>
+
+  <!-- ============ CSS SNIPPET ============ -->
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0">Copy CSS</h2>
+    </div>
+    <div class="snippet" id="snippet">
+      <button class="copy" id="copyBtn">Copy</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============================================================
+  // WCAG contrast math
+  // ============================================================
+  const srgb = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+  function lum(hex) {
+    const h = hex.replace('#','');
+    return 0.2126 * srgb(parseInt(h.slice(0,2),16))
+         + 0.7152 * srgb(parseInt(h.slice(2,4),16))
+         + 0.0722 * srgb(parseInt(h.slice(4,6),16));
+  }
+  function contrast(a, b) {
+    const la = lum(a), lb = lum(b);
+    const [hi, lo] = la > lb ? [la, lb] : [lb, la];
+    return (hi + 0.05) / (lo + 0.05);
+  }
+  const isHex = s => /^#[0-9a-fA-F]{6}$/.test(s);
+  const norm  = s => s.startsWith('#') ? s.toUpperCase() : '#' + s.toUpperCase();
+  function bestText(bg) {
+    return contrast('#FFFFFF', bg) >= contrast('#1F2937', bg) ? '#FFFFFF' : '#1F2937';
+  }
+
+  // ============================================================
+  // Suggestions — curated to all clear ≥ 8:1 contrast w/ white text.
+  // Mix of warm complements of teal + deep neutrals.
+  // ============================================================
+  const SUGGESTIONS = [
+    { hex: '#E75C0D', name: 'Current Biztech CTA', note: '⚠ Currently live on biztechcs.com — 3.54:1, FAILS WCAG AA', current: true },
+    { hex: '#7C2D12', name: 'Deep Burnt Orange',   note: 'Recommended — complement of teal, premium feel' },
+    { hex: '#7F1D1D', name: 'Executive Red',       note: 'Confident, mature, near-AAA range' },
+    { hex: '#831843', name: 'Dark Berry',          note: 'Sophisticated warm magenta' },
+    { hex: '#881337', name: 'Burgundy Rose',       note: 'Refined, pairs well with teal' },
+    { hex: '#9A031E', name: 'Carmine',             note: 'Bold, classic CTA red' },
+    { hex: '#991B1B', name: 'Brick Red',           note: 'Just over the 8:1 line' },
+    { hex: '#6B21A8', name: 'Royal Purple',        note: 'Triadic alternative — premium B2B' },
+    { hex: '#1E40AF', name: 'Deep Navy',           note: 'Strategic neutral, very high contrast' },
+    { hex: '#1F2937', name: 'Slate',               note: 'Inverted strategy — dark on white' },
+    { hex: '#0F172A', name: 'Near-Black',          note: 'Maximum contrast — minimalist look' },
+  ];
+
+  // ============================================================
+  // State
+  // ============================================================
+  const S = {
+    bg:  '#7C2D12',
+    txt: '#FFFFFF',
+    rad: 10,
+    label: 'Talk to Experts →',
+    surface: 'white',
+  };
+
+  // ============================================================
+  // DOM refs
+  // ============================================================
+  const $ = id => document.getElementById(id);
+  const stage   = $('stage');
+  const ctaBtn  = $('ctaBtn');
+  const ctaMeta = $('ctaMeta');
+  const cxNum   = $('cxNum');
+  const cxLbl   = $('cxLbl');
+  const badges  = $('badges');
+  const swatchesEl = $('swatches');
+  const snippetEl = $('snippet');
+
+  // ============================================================
+  // Render
+  // ============================================================
+  function render() {
+    // CTA
+    ctaBtn.style.background = S.bg;
+    ctaBtn.style.color      = S.txt;
+    ctaBtn.style.borderRadius = S.rad + 'px';
+    ctaBtn.textContent = S.label;
+
+    // Stage surface
+    stage.className = 'stage surface-' + S.surface;
+
+    // Meta
+    const surfaceColor = {
+      white: '#FFFFFF', light: '#F1F5F9',
+      teal:  '#35B0BF', dark:  '#373435'
+    }[S.surface];
+    ctaMeta.textContent = `${S.bg} on ${surfaceColor}`;
+
+    // Contrast — text vs button bg (AA target = 4.5)
+    const cText = contrast(S.txt, S.bg);
+    // Component contrast — button bg vs surface (AA target = 3.0)
+    const cComp = contrast(S.bg, surfaceColor);
+
+    cxNum.textContent = cText.toFixed(2) + ' : 1';
+    cxLbl.textContent = `Text vs button — ${verdictLabel(cText, 'text')} · Button vs surface ${cComp.toFixed(2)}:1 ${verdictLabel(cComp, 'comp')}`;
+
+    badges.innerHTML = '';
+    badges.appendChild(badgeFor(cText, 'text'));
+    badges.appendChild(badgeFor(cComp, 'comp'));
+
+    // Inputs reflect state
+    $('pBg').value  = S.bg;  $('hBg').value  = S.bg;
+    $('pTxt').value = S.txt; $('hTxt').value = S.txt;
+    $('pRad').value = S.rad; $('vRad').textContent = S.rad + 'px';
+    $('pLbl').value = S.label;
+
+    // Suggestions
+    swatchesEl.innerHTML = '';
+    SUGGESTIONS.forEach(s => {
+      const el = document.createElement('button');
+      el.className = 'sw' + (s.hex.toUpperCase() === S.bg.toUpperCase() ? ' active' : '') + (s.current ? ' is-current' : '');
+      const cWhite = contrast('#FFFFFF', s.hex);
+      const cDark  = contrast('#1F2937', s.hex);
+      const better = cWhite > cDark ? `white ${cWhite.toFixed(1)}:1` : `dark ${cDark.toFixed(1)}:1`;
+      const badge = s.current ? `<span class="current-badge">LIVE</span>` : '';
+      el.innerHTML = `
+        <div class="chip" style="background:${s.hex}"></div>
+        <div class="info">
+          <div class="name">${s.name} ${badge}</div>
+          <div class="hex">${s.hex} · best fg: ${better}</div>
+          <div class="note">${s.note}</div>
+        </div>
+      `;
+      el.onclick = () => {
+        S.bg = s.hex;
+        S.txt = bestText(s.hex);
+        render();
+      };
+      swatchesEl.appendChild(el);
+    });
+
+    // Snippet
+    snippetEl.innerHTML = `
+      <button class="copy" id="copyBtn">Copy</button>
+<span class="c">/* Biztech CTA */</span>
+.cta {
+  <span class="k">background</span>: <span class="v">${S.bg}</span>;
+  <span class="k">color</span>: <span class="v">${S.txt}</span>;
+  <span class="k">padding</span>: <span class="v">16px 30px</span>;
+  <span class="k">border-radius</span>: <span class="v">${S.rad}px</span>;
+  <span class="k">font-weight</span>: <span class="v">600</span>;
+  <span class="k">border</span>: <span class="v">0</span>;
+  <span class="k">cursor</span>: <span class="v">pointer</span>;
+}
+.cta:hover { <span class="k">filter</span>: <span class="v">brightness(0.92)</span>; }`.trim();
+
+    document.getElementById('copyBtn').onclick = copySnippet;
+  }
+
+  function verdictLabel(r, kind) {
+    if (kind === 'text') {
+      if (r >= 7)   return '✓ AAA';
+      if (r >= 4.5) return '✓ AA';
+      if (r >= 3)   return '△ AA Large only';
+      return '✗ Fail';
+    } else {
+      if (r >= 4.5) return '✓ AA';
+      if (r >= 3)   return '✓ AA component';
+      return '✗ Below 3:1';
+    }
+  }
+  function badgeFor(r, kind) {
+    const span = document.createElement('span');
+    span.className = 'pill ';
+    let txt;
+    if (kind === 'text') {
+      if (r >= 7)        { span.className += 'pill-aaa';   txt = 'Text AAA'; }
+      else if (r >= 4.5) { span.className += 'pill-aa';    txt = 'Text AA'; }
+      else if (r >= 3)   { span.className += 'pill-aa-l';  txt = 'Text AA Large only'; }
+      else               { span.className += 'pill-fail';  txt = 'Text Fails AA'; }
+    } else {
+      if (r >= 4.5)      { span.className += 'pill-aaa';   txt = 'Component AA'; }
+      else if (r >= 3)   { span.className += 'pill-aa';    txt = 'Component AA ✓'; }
+      else               { span.className += 'pill-fail';  txt = 'Component below 3:1'; }
+    }
+    span.textContent = txt;
+    return span;
+  }
+
+  function copySnippet() {
+    const text = snippetEl.innerText.replace(/^Copy\s*/, '');
+    navigator.clipboard.writeText(text).then(() => {
+      const b = document.getElementById('copyBtn');
+      b.textContent = 'Copied ✓';
+      setTimeout(() => (b.textContent = 'Copy'), 1200);
+    });
+  }
+
+  // ============================================================
+  // Event wiring
+  // ============================================================
+  function bindColor(picker, hexInput, key) {
+    picker.addEventListener('input', e => { S[key] = norm(e.target.value); render(); });
+    hexInput.addEventListener('input', e => {
+      const v = e.target.value.trim();
+      const cleaned = v.startsWith('#') ? v : '#' + v;
+      if (isHex(cleaned)) { S[key] = cleaned.toUpperCase(); render(); }
+    });
+  }
+  bindColor($('pBg'),  $('hBg'),  'bg');
+  bindColor($('pTxt'), $('hTxt'), 'txt');
+
+  $('pRad').addEventListener('input', e => { S.rad = +e.target.value; render(); });
+  $('pLbl').addEventListener('input', e => { S.label = e.target.value || ' '; render(); });
+
+  document.getElementById('surfaceRow').addEventListener('click', e => {
+    const b = e.target.closest('button[data-surface]');
+    if (!b) return;
+    document.querySelectorAll('#surfaceRow button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    S.surface = b.dataset.surface;
+    render();
+  });
+
+  document.querySelector('.quick').addEventListener('click', e => {
+    const a = e.target.closest('button[data-action]');
+    if (!a) return;
+    if (a.dataset.action === 'white-text') S.txt = '#FFFFFF';
+    if (a.dataset.action === 'dark-text')  S.txt = '#1F2937';
+    if (a.dataset.action === 'auto-text')  S.txt = bestText(S.bg);
+    if (a.dataset.action === 'reset') {
+      S.bg = '#7C2D12'; S.txt = '#FFFFFF'; S.rad = 10; S.label = 'Talk to Experts →'; S.surface = 'white';
+      document.querySelectorAll('#surfaceRow button').forEach(x => x.classList.remove('active'));
+      document.querySelector('#surfaceRow button[data-surface=white]').classList.add('active');
+    }
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
