@@ -224,6 +224,18 @@
   }
   .row input[type=text]:focus { outline: 2px solid #93C5FD; outline-offset: -1px; }
 
+  .row .auto-btn {
+    background: #F1F5F9; border: 1px solid var(--line);
+    padding: 8px 10px; border-radius: 8px;
+    font: inherit; font-size: 11px; font-weight: 600;
+    cursor: pointer; color: var(--muted);
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .row .auto-btn:hover { background: #E2E8F0; color: var(--ink); }
+  .row .auto-btn.active {
+    background: #DBEAFE; color: #1E3A8A; border-color: #93C5FD;
+  }
+
   .quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
   .quick button {
     background: #F1F5F9; border: 1px solid var(--line);
@@ -374,6 +386,13 @@
       </div>
 
       <div class="row">
+        <label for="pHover">Hover</label>
+        <input type="color" id="pHover" value="#5C220E" />
+        <input type="text"  id="hHover" value="#5C220E" maxlength="7" />
+        <button type="button" class="auto-btn active" id="autoHoverBtn" title="Auto-compute hover from button color">Auto</button>
+      </div>
+
+      <div class="row">
         <label for="pRad">Radius</label>
         <input type="range" id="pRad" min="0" max="32" value="10" style="flex:1" />
         <span id="vRad" style="font-variant-numeric:tabular-nums;width:48px;text-align:right;color:var(--muted)">10px</span>
@@ -500,6 +519,7 @@
   const S = {
     bg:  '#7C2D12',
     txt: '#FFFFFF',
+    hover: null,            // null = auto-compute from bg; otherwise a custom hex
     rad: 10,
     label: 'Talk to Experts →',
     surface: 'white',
@@ -522,8 +542,8 @@
   // Render
   // ============================================================
   function render() {
-    // Auto-computed hover color — darken normal colors, lighten very dark ones
-    const hoverHex = bestHover(S.bg);
+    // Hover color — user-set override, else auto-darken/lighten from bg
+    const hoverHex = S.hover || bestHover(S.bg);
 
     // CTA
     ctaBtn.style.background = S.bg;
@@ -576,6 +596,8 @@
     // Inputs reflect state
     $('pBg').value  = S.bg;  $('hBg').value  = S.bg;
     $('pTxt').value = S.txt; $('hTxt').value = S.txt;
+    $('pHover').value = hoverHex; $('hHover').value = hoverHex;
+    $('autoHoverBtn').classList.toggle('active', S.hover === null);
     $('pRad').value = S.rad; $('vRad').textContent = S.rad + 'px';
     $('pLbl').value = S.label;
 
@@ -599,6 +621,7 @@
       el.onclick = () => {
         S.bg = s.hex;
         S.txt = bestText(s.hex);
+        S.hover = null;
         render();
       };
       swatchesEl.appendChild(el);
@@ -683,6 +706,8 @@
   }
   bindColor($('pBg'),  $('hBg'),  'bg');
   bindColor($('pTxt'), $('hTxt'), 'txt');
+  bindColor($('pHover'), $('hHover'), 'hover');
+  $('autoHoverBtn').addEventListener('click', () => { S.hover = null; render(); });
 
   $('pRad').addEventListener('input', e => { S.rad = +e.target.value; render(); });
   $('pLbl').addEventListener('input', e => { S.label = e.target.value || ' '; render(); });
@@ -701,6 +726,7 @@
     if (!b) return;
     S.bg = b.dataset.color.toUpperCase();
     S.txt = bestText(S.bg);
+    S.hover = null;
     render();
   });
 
@@ -711,7 +737,7 @@
     if (a.dataset.action === 'dark-text')  S.txt = '#1F2937';
     if (a.dataset.action === 'auto-text')  S.txt = bestText(S.bg);
     if (a.dataset.action === 'reset') {
-      S.bg = '#7C2D12'; S.txt = '#FFFFFF'; S.rad = 10; S.label = 'Talk to Experts →'; S.surface = 'white';
+      S.bg = '#7C2D12'; S.txt = '#FFFFFF'; S.hover = null; S.rad = 10; S.label = 'Talk to Experts →'; S.surface = 'white';
       document.querySelectorAll('#surfaceRow button').forEach(x => x.classList.remove('active'));
       document.querySelector('#surfaceRow button[data-surface=white]').classList.add('active');
     }
