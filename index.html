@@ -606,16 +606,12 @@
     SUGGESTIONS.forEach(s => {
       const el = document.createElement('button');
       el.className = 'sw' + (s.hex.toUpperCase() === S.bg.toUpperCase() ? ' active' : '') + (s.current ? ' is-current' : '');
-      const cWhite = contrast('#FFFFFF', s.hex);
-      const cDark  = contrast('#1F2937', s.hex);
-      const better = cWhite > cDark ? `white ${cWhite.toFixed(1)}:1` : `dark ${cDark.toFixed(1)}:1`;
       const badge = s.current ? `<span class="current-badge">LIVE</span>` : '';
       el.innerHTML = `
         <div class="chip" style="background:${s.hex}"></div>
         <div class="info">
           <div class="name">${s.name} ${badge}</div>
-          <div class="hex">${s.hex} · best fg: ${better}</div>
-          <div class="note">${s.note}</div>
+          <div class="hex">${s.hex}</div>
         </div>
       `;
       el.onclick = () => {
